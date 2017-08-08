@@ -29,7 +29,6 @@ const mutations = {
 		state.style1 = true;
 		state.style2 = false;
 	},
-
 }
 export default{
 	state,

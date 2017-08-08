@@ -2,12 +2,26 @@
   <div id="app">
   	<el-row>
   		<el-col :span="24" class="topNav"><div class="grid-content bg-purple">
-  		<my-menu></my-menu>
+  		<my-menu @open-login="openDialog('dialogFormVisible')" :message="loginsuccess"></my-menu>
   		</div></el-col>
 			<el-col :span="24" class="secNav"><div class="grid-content1 bg-purple-dark">
 				<span class="navTitle">>当前位置: <span class="nav">{{navMsg}}</span></span>
 			</div></el-col>
-			
+			<el-dialog title="登录" :visible.sync="dialogFormVisible"  >
+		  <el-form :model="form">
+		    <el-form-item label="用户名" :label-width="formLabelWidth">
+		      <el-input v-model="form.name" class="login" auto-complete="off"></el-input>
+		    </el-form-item>
+		 <el-form-item label="密码" :label-width="formLabelWidth">
+		      <el-input v-model="form.password" type="password" class="login" auto-complete="off"></el-input>
+		    </el-form-item>
+		  </el-form>
+		  <span class="errorText">{{errorMessage.text}}</span>
+		  <div slot="footer" class="dialog-footer">
+		    <el-button @click="dialogFormVisible = false">取 消</el-button>
+		    <el-button type="primary" @click="loginin">确 定</el-button>
+		  </div>
+		 </el-dialog>
   		<router-view></router-view>
   		<el-col :span="24"><div class="grid-content bg-bottom"></div></el-col>
   		
@@ -39,6 +53,38 @@ export default {
 			}else if(curRouter=='page1'){
 				this.navMsg = '处理中心1';
 			}
+		},
+		openDialog(attr){
+			this[attr] = true;
+			this.form.name ='zhangsan';
+			this.form.password =123456;
+			this.errorMessage.text = '';
+		},
+		loginin(){
+			if(this.form.name==''&&this.form.password ==''){
+					this.errorMessage.status=false;
+					this.errorMessage.text = '选项不能为空';
+			}else{
+				this.$http.get('./userMessage')
+				.then((res)=>{
+						console.log(res.data);
+						let ueserMessage = res.data.user;
+						if(ueserMessage.name == this.form.name && ueserMessage.password == this.form.password){
+						  this.loginsuccess = true;
+							this.dialogFormVisible = false;
+						}else{
+							this.errorMessage.status=false;
+							this.errorMessage.text = '用户名或密码错误！';
+						}
+				},(error)=>{
+					console.log("error"); 
+				
+				})
+				
+				
+				
+			}
+			
 		}
 	},
 	mounted () {
@@ -54,7 +100,25 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      navMsg: ''
+      navMsg: '',
+      dialogFormVisible: false,
+         form: {
+          name: '',
+          region: '',
+          date1: '',
+          date2: '',
+          delivery: false,
+          type: [],
+          resource: '',
+          desc: '',
+          password: ''
+        },
+				 formLabelWidth: '80px',
+				 errorMessage:{
+				 	 status:'',
+				 	 text: '',
+				 },
+				 loginsuccess:false,
     }
   }
 }
@@ -96,6 +160,8 @@ body,html{
 .topNav,.secNav{
 	position: fixed;
 	z-index: 100;
+	top: 0;
+	left: 0;
 }
 .secNav{
 	margin-top: 41px;
@@ -154,5 +220,17 @@ body,html{
   	margin-left: 80px;
   	margin-top: 3px;
   	position: absolute;
+  }
+  .el-dialog--small{
+  	width:35%
+  }
+  .el-dialog__header{
+  	text-align: center;
+  }
+  .login{
+  	width: 300px;
+  }
+  .errorText{
+  	color:red;
   }
 </style>

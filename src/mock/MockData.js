@@ -1,7 +1,13 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 var  mock = new MockAdapter(axios);
-
+ 
+ mock.onGet('./userMessage').reply(200,{
+ 	user:{
+ 			"name"     :"zhangsan",
+ 			"password" : 123456,
+ 	 }
+ })
  mock.onPost('http://getList').reply(200,{
 	
 	list:[

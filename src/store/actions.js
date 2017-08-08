@@ -29,5 +29,4 @@ export default{
 	},val) =>{
 		commit('SAVE');
 	},
-
 }
